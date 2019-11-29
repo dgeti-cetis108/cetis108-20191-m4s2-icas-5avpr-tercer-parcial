@@ -89,17 +89,28 @@ create table books_has_authors (
 
 create table loans (
     id int auto_increment primary key,
+    invoice char(6) not null, -- 201901
     user_id int not null,
     client_id int not null,
-    date_outgoing timestamp not null deafult current_timestamp,
-    date_incoming timestamp null default null
+    date timestamp not null default current_timestamp,
+    type enum('Salida','Regreso') not null,
+    constraint fk_loans__users
+        foreign key (user_id)
+        references users(id)
+            on update cascade
+            on delete restrict,
+    constraint fk_loans__clients
+        foreign key (client_id)
+        references clients(id)
+            on update cascade
+            on delete restrict
 ) engine=innodb, charset=utf8, collate=utf8_general_ci;
 
 create table loans_has_books (
     loan_id int not null,
     book_id int not null,
     quantity tinyint not null,
-    primary key (loan_id, book_id)
+    primary key (loan_id, book_id),
     constraint fk_loans_has_books__loans
         foreign key (loan_id)
         references loans(id)
